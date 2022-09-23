@@ -1,0 +1,1 @@
+from metaqueue.queue.basic import MetaQueue, Metadata
