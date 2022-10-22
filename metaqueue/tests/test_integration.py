@@ -24,15 +24,15 @@ class TestIntegration:
             task3 = enum.auto()
 
         async def task1(value: int, metadataengine: MetadataEngine):
-            metadataengine.publish_to_topic(Metadata(data = value, name = "task1_value", location = "Tmp1"))
+            metadataengine.publish_to_topic(Metadata(data = value, name = "task1_value", location = "Tmp1", context = "test"))
             return value ** 2
 
         async def task2(value: str, metadataengine: MetadataEngine):
-            metadataengine.publish_to_topic(Metadata(data = value, name = "task2_value", location = "Tmp2"))
+            metadataengine.publish_to_topic(Metadata(data = value, name = "task2_value", location = "Tmp2", context = "test"))
             return f"{value}"
 
         async def task3(value: float, metadataengine: MetadataEngine):
-            metadataengine.publish_to_topic(Metadata(data = value, name = "task3_value", location = "Tmp3"))
+            metadataengine.publish_to_topic(Metadata(data = value, name = "task3_value", location = "Tmp3", context = "test"))
             return 2.0 * value
 
         task1_queue  = MetaQueue(buffer_size = 3, dtype = int)
@@ -63,6 +63,6 @@ class TestIntegration:
                     continue
                 inactive += 1
 
-        assert metadates[0]  == Metadata(data = 1, name = 'task1_value', location = 'Tmp1')
-        assert metadates[1]  == Metadata(data = 'tmp', name = 'task2_value', location = 'Tmp2')
-        assert metadates[-1] == Metadata(data = 4.5, name = 'task3_value', location = 'Tmp3')
+        assert metadates[0]  == Metadata(data = 1, name = 'task1_value', location = 'Tmp1', context = "test")
+        assert metadates[1]  == Metadata(data = 'tmp', name = 'task2_value', location = 'Tmp2', context = "test")
+        assert metadates[-1] == Metadata(data = 4.5, name = 'task3_value', location = 'Tmp3', context = "test")

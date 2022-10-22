@@ -36,9 +36,9 @@ class TestMetadataEngine:
         mq = MetaQueue(buffer_size = 3, dtype = str)
         mdengine = MetadataEngine(topic = topics.topic1, queue = mq)
         
-        mdengine.publish_to_topic(Metadata(data = "test", name = "test_name", location = "test_location"))
+        mdengine.publish_to_topic(Metadata(data = "test", name = "test_name", location = "test_location", context = "test"))
         act_metadata = mdengine.retrieve_data_from_queue()
-        exp_metadata = Metadata(data = "test", name = "test_name", location = "test_location")
+        exp_metadata = Metadata(data = "test", name = "test_name", location = "test_location", context = "test")
 
         assert act_metadata == exp_metadata
 
@@ -47,8 +47,8 @@ class TestMetadataEngine:
         mq = MetaQueue(buffer_size = 10, dtype = int)
         mdengine = MetadataEngine(topic = topics.topic1, queue = mq)
         
-        mdengine.publish_to_topic(Metadata(data = 2, name = "test_name", location = "test_location"))
-        mdengine.publish_to_topic(Metadata(data = 4, name = "test_name", location = "test_location"))
+        mdengine.publish_to_topic(Metadata(data = 2, name = "test_name", location = "test_location", context = "test"))
+        mdengine.publish_to_topic(Metadata(data = 4, name = "test_name", location = "test_location", context = "test"))
         act_capacity = mdengine.get_queue_capacity()
         exp_capacity = 2
 

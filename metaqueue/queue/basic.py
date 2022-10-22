@@ -19,6 +19,7 @@ class Metadata:
     data: Any
     name: str
     location: str
+    context: str
 
 
 @attrs.define
