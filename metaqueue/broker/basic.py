@@ -53,16 +53,16 @@ class MetaBroker:
         """
         capacity_of_queues = np.zeros(len(self.metadataengines))
         while True:
-            stopwatch = time.clock()
+            stopwatch = time.time()
             for index, mdengine in enumerate(self.metadataengines):
                 current_capacity          = mdengine.get_queue_capacity()
                 capacity_of_queues[index] = current_capacity
                 if current_capacity > 0:
                     metadata = mdengine.retrieve_data_from_queue()
-                    metainfo = MetaInformation(name = metadata["name"], location = metadata["location"], context = metadata["context"])
+                    metainfo = MetaInformation(name = metadata.name, location = metadata.location, context = metadata.context)
                     self.metastore.push_metainformation(metainfo)
 
-            if (time.clock() - stopwatch) >= timeout:
+            if (time.time() - stopwatch) >= timeout:
                 break
 
             is_empty = [True if capacity == 0 else False for capacity in capacity_of_queues]

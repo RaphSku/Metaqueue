@@ -1,7 +1,9 @@
 """
 TestBasicMetaBroker
 -------------------
-Testing the Metabroker
+Testing the Metabroker whether the running 
+of the metadataengines works and if the metadata
+is stored correctly at their appropriate destination.
 """
 
 import os
