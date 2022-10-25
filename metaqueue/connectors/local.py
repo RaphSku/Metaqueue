@@ -9,10 +9,11 @@ import attrs
 import datetime
 
 from metaqueue.queue import Metadata
+from metaqueue.connectors.interface import IFConnector
 
 
 @attrs.define
-class StoreToLocalhost:
+class StoreToLocalhost(IFConnector):
     path =  attrs.field(factory = str)
 
 

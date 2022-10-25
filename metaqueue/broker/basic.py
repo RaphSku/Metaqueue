@@ -11,8 +11,9 @@ import time
 import attrs
 import numpy as np
 
-from metaqueue.engine import MetadataEngine
-from metaqueue.store  import MetaStore, MetaInformation
+from metaqueue.engine               import MetadataEngine
+from metaqueue.store                import MetaStore, MetaInformation
+from metaqueue.connectors.interface import IFConnector
 
 
 @attrs.define
@@ -33,11 +34,13 @@ class MetaBroker:
     """
     metadataengines = attrs.field(factory = list)
     metastore       = attrs.field(factory = MetaStore)
+    connector       = attrs.field(factory = IFConnector)
 
 
-    def __init__(self, metadataengines: list[MetadataEngine], metastore: MetaStore) -> None:
+    def __init__(self, metadataengines: list[MetadataEngine], metastore: MetaStore, connector: IFConnector) -> None:
         self.metadataengines = metadataengines
         self.metastore       = metastore
+        self.connector       = connector
 
 
     def run(self, timeout: int) -> None:
@@ -61,6 +64,7 @@ class MetaBroker:
                     metadata = mdengine.retrieve_data_from_queue()
                     metainfo = MetaInformation(name = metadata.name, location = metadata.location, context = metadata.context)
                     self.metastore.push_metainformation(metainfo)
+                    self.connector.store(metadata = metadata)
 
             if (time.time() - stopwatch) >= timeout:
                 break

@@ -11,10 +11,11 @@ import pytest
 import enum
 import dotenv
 
-from metaqueue.queue  import MetaQueue
-from metaqueue.engine import MetadataEngine
-from metaqueue.broker import MetaBroker
-from metaqueue.store  import MetaStore
+from metaqueue.queue      import MetaQueue
+from metaqueue.engine     import MetadataEngine
+from metaqueue.broker     import MetaBroker
+from metaqueue.store      import MetaStore
+from metaqueue.connectors import StoreToLocalhost
 
 
 @pytest.fixture
@@ -44,5 +45,6 @@ def metadataengines():
 
 class TestBasicMetaBroker:
     def test_running_s01(self, metastore, metadataengines):
-        metabroker = MetaBroker(metadataengines = metadataengines, metastore = metastore)
+        connector  = StoreToLocalhost(path = "./")
+        metabroker = MetaBroker(metadataengines = metadataengines, metastore = metastore, connector = connector)
         metabroker.run(timeout = 10)
