@@ -1,3 +1,10 @@
+"""
+TestStoreToLocalhost
+--------------------
+Testing whether the metadata is correctly
+stored on the local filesystem
+"""
+
 import os
 import re
 import pytest

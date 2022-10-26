@@ -26,8 +26,12 @@ def metainformation():
     yield MetaInformation(name = "e407d43e-f075-47ce-ad1a", location = "Generate", context = "Bound")
 
 
-def teardown_metainformation():
-    connection = psycopg2.connect(host = "localhost", database = "meta", user = "raphael", password = "test1", port = "5432")
+def teardown_metainformation(host, database, user, password, port):
+    connection = psycopg2.connect(host = host, 
+                                  database = database, 
+                                  user = user,
+                                  password = password, 
+                                  port = port)
     cursor     = connection.cursor()
     cursor.execute(f"delete from metadata where name='e407d43e-f075-47ce-ad1a'; commit;")
     cursor.close()
@@ -76,4 +80,8 @@ class TestMetaStore:
         assert act_record[1] == "Generate"
         assert act_record[2] == "Bound"
 
-        teardown_metainformation()
+        teardown_metainformation(host = load_db_info[0], 
+                                 database = load_db_info[1], 
+                                 user = load_db_info[2], 
+                                 password = load_db_info[3], 
+                                 port = load_db_info[4])

@@ -20,4 +20,14 @@ class IFConnector(metaclass = abc.ABCMeta):
     
     @abstractmethod
     def store(self, metadata: Metadata) -> None:
+        """
+        This method is responsible for storing the metadata
+        to its designated destination
+
+        Parameters
+        ----------
+        metadata: Metadata
+            `metadata` respresents the collection of information which make up
+            the primary metadata 
+        """
         pass
