@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "metaqueue"
-version = "0.1.0"
+version = "0.1.1"
 description = "Metaqueue enables simple and efficient metadata collection"
 authors = ["RaphSku <rapsku.dev@gmail.com>"]
 license = "BSD-3-Clause"
