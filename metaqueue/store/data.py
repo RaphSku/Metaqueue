@@ -110,7 +110,7 @@ class MetaStore:
                                           password = self._params["password"],
                                           port     = self._params["port"])
             cursor     = connection.cursor()
-            cursor.execute(f"CREATE DATABASE {self._params['database']};")
+            cursor.execute(f"create database {self._params['database']};")
             cursor.close()
 
             connection = self._connect_to_psql_db()

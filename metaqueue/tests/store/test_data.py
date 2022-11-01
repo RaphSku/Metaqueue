@@ -6,19 +6,15 @@ database with a relation and the insertion
 of metainformation into the relation
 """
 
-import os
 import psycopg2
 import pytest
-import dotenv
 
 from metaqueue.store  import MetaStore, MetaInformation
 
 
 @pytest.fixture
-def load_db_info():
-    dotenv.load_dotenv("config.env")
-
-    yield [os.getenv("HOST"), os.getenv("DATABASE"), os.getenv("USER"), os.getenv("PASSWORD"), os.getenv("PORT")]
+def db_info():
+    yield {'host': "localhost", 'database': "meta", 'user': "test", 'password': "test", 'port': "9050"}
 
 
 @pytest.fixture
@@ -38,18 +34,10 @@ def teardown_metainformation(host, database, user, password, port):
 
 
 class TestMetaStore:
-    def test_initialisation_s01(self, load_db_info):
-        MetaStore(host = load_db_info[0], 
-                  database = load_db_info[1], 
-                  user = load_db_info[2],
-                  password = load_db_info[3], 
-                  port = load_db_info[4])
+    def test_initialisation_s01(self, db_info):
+        MetaStore(**db_info)
         
-        connection = psycopg2.connect(host = load_db_info[0], 
-                                      database = load_db_info[1],
-                                      user = load_db_info[2], 
-                                      password = load_db_info[3], 
-                                      port = load_db_info[4])
+        connection = psycopg2.connect(**db_info)
         cursor     = connection.cursor()
         cursor.execute(f"select exists(select * from information_schema.tables where table_name='metadata');")
         act_record = cursor.description
@@ -58,19 +46,11 @@ class TestMetaStore:
         assert act_record[0].name == "exists"
 
 
-    def test_push_s01(self, load_db_info, metainformation):
-        metastore = MetaStore(host = load_db_info[0], 
-                              database = load_db_info[1], 
-                              user = load_db_info[2], 
-                              password = load_db_info[3], 
-                              port = load_db_info[4])
+    def test_push_s01(self, db_info, metainformation):
+        metastore = MetaStore(**db_info)
         metastore.push_metainformation(info = metainformation)
 
-        connection = psycopg2.connect(host = load_db_info[0], 
-                                      database = load_db_info[1], 
-                                      user = load_db_info[2], 
-                                      password = load_db_info[3], 
-                                      port = load_db_info[4])
+        connection = psycopg2.connect(**db_info)
         cursor     = connection.cursor()
         cursor.execute(f"select name, location, context from metadata;")
         act_record = cursor.fetchone()
@@ -80,8 +60,4 @@ class TestMetaStore:
         assert act_record[1] == "Generate"
         assert act_record[2] == "Bound"
 
-        teardown_metainformation(host = load_db_info[0], 
-                                 database = load_db_info[1], 
-                                 user = load_db_info[2], 
-                                 password = load_db_info[3], 
-                                 port = load_db_info[4])
+        teardown_metainformation(**db_info)
