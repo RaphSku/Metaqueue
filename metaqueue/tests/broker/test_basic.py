@@ -10,7 +10,6 @@ import os
 import psycopg2
 import pytest 
 import enum
-import dotenv
 
 from metaqueue.queue      import MetaQueue, Metadata
 from metaqueue.engine     import MetadataEngine
@@ -20,21 +19,17 @@ from metaqueue.connectors import StoreToLocalhost
 
 
 @pytest.fixture
-def setUp():
-    dotenv.load_dotenv("config.env")
-
-    yield {'host': os.getenv("HOST"), 
-           'database': os.getenv("DATABASE"), 
-           'user': os.getenv("USER"), 
-           'password': os.getenv("PASSWORD"), 
-           'port': os.getenv("PORT")}
+def db_info():
+    yield {'host': "localhost", 
+           'database': "meta", 
+           'user': "test", 
+           'password': "test", 
+           'port': "9050"}
 
 
 @pytest.fixture
-def metastore(setUp):
-    dotenv.load_dotenv("config.env")
-
-    yield MetaStore(**setUp)
+def metastore(db_info):
+    yield MetaStore(**db_info)
     
 
 @pytest.fixture
@@ -55,21 +50,17 @@ def metadataengines():
     yield [metadataengine_1, metadataengine_2]
     
 
-def tearDown(db_info):
-    connection = psycopg2.connect(**db_info)
-    cursor     = connection.cursor()
-    cursor.execute(f"delete from metadata where name='Test Person'; commit;")
-    cursor.execute(f"delete from metadata where name='total_requests'; commit;")
-    cursor.close()
-
-    if os.path.exists("./log.txt"):
-        os.remove("./log.txt")
-
-
 class TestBasicMetaBroker:
-    def test_running_s01(self, metastore, metadataengines, setUp):
+    def test_running_s01(self, metastore, metadataengines, db_info):
         connector  = StoreToLocalhost(path = "./log.txt")
         metabroker = MetaBroker(metadataengines = metadataengines, metastore = metastore, connector = connector)
         metabroker.run(timeout = 10)
 
-        tearDown(setUp)
+        connection = psycopg2.connect(**db_info)
+        cursor     = connection.cursor()
+        cursor.execute(f"delete from metadata where name='Test Person'; commit;")
+        cursor.execute(f"delete from metadata where name='total_requests'; commit;")
+        cursor.close()
+
+        if os.path.exists("./log.txt"):
+            os.remove("./log.txt")
