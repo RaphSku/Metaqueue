@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Metaqueue enables simple and efficient metadata collection"
 authors = ["RaphSku <rapsku.dev@gmail.com>"]
 license = "BSD-3-Clause"
+repository = "https://github.com/RaphSku/Metaqueue"
+readme = "README.md"
+keywords = ["metadata", "collection", "management", "storing"]
+exclude = ["metaqueue/tests/*"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
