@@ -29,6 +29,15 @@ jobs:
     - name: Install dependencies
       run: |
         poetry install
+    - name: Install Docker
+      run: |
+        sudo apt-get install docker-ce docker-ce-cli
+    - name: Build db image
+      run: |
+        cd metaqueue/tests
+        docker build . -t metaqueue_test_db
+        docker run -d -p 9050:5432 -e POSTGRES_PASSWORD=test -e POSTGRES_DB=meta -e POSTGRES_USER=test metaqueue_test_db
+        cd ../..
     - name: Test with pytest
       run: |
         poetry run pytest
