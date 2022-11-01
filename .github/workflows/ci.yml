@@ -1,0 +1,55 @@
+name: Metaqueue CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+        poetry-version: ["1.1.13"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Setup Poetry
+      uses: abatilo/actions-poetry@v2.0.0
+      with:
+        poetry-version: ${{ matrix.poetry-version }}
+    - name: Install dependencies
+      run: |
+        poetry install
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install \
+           ca-certificates \
+           curl \
+           gnupg \
+           lsb-release
+        sudo mkdir -p /etc/apt/keyrings
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+        echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install docker-ce docker-ce-cli
+    - name: Build db image
+      run: |
+        cd metaqueue/tests
+        docker build . -t metaqueue_test_db
+        docker run -d -p 9050:5432 -e POSTGRES_PASSWORD=test -e POSTGRES_DB=meta -e POSTGRES_USER=test metaqueue_test_db
+        cd ../..
+    - name: Test with pytest
+      run: |
+        poetry run pytest
