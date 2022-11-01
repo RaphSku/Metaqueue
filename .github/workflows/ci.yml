@@ -48,8 +48,9 @@ jobs:
       run: |
         cd metaqueue/tests
         docker build . -t metaqueue_test_db
+    - name: Run db image
+      run: |
         docker run -d -p 9050:5432 -e POSTGRES_PASSWORD=test -e POSTGRES_DB=meta -e POSTGRES_USER=test metaqueue_test_db
-        cd ../..
     - name: Test with pytest
       run: |
         poetry run pytest
