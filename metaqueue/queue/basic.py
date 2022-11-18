@@ -6,6 +6,7 @@ Metadata Engine
 """
 
 import attrs
+import enum
 
 from typing import Any
 from collections import deque
@@ -39,6 +40,7 @@ class MetaQueue:
     buffer_size = attrs.field(factory = int)
     dtype       = attrs.field(factory = type)
     _index      = attrs.field(factory = int)
+    engine_id   = attrs.field(factory = enum.Enum)
 
 
     def __init__(self, buffer_size: int, dtype: type) -> None:
@@ -46,6 +48,7 @@ class MetaQueue:
         self._data       = deque(maxlen = buffer_size)
         self.dtype       = dtype
         self._index      = 0
+        self.engine_id   = None
 
 
     def push(self, metadata: Metadata) -> None:
@@ -90,6 +93,29 @@ class MetaQueue:
             raise ValueError(f"Queue is empty, nothing to remove!")
         self._index -= 1
         return self._data.popleft()
+
+
+    def register_engine(self, topic: enum.Enum) -> None:
+        """
+        Registering the Metadataengine with the Metaqueue
+
+        Parameters
+        ----------
+        topic: enum.Enum
+            Topic which is associated with the MetaQueue if it is registered with a 
+            MetadataEngine together
+
+        Raises
+        ------
+            RuntimeError
+                When the registered topic does not match with the topic of the MetadataEngine
+                then it will raise a RuntimeError
+        """
+        if self.engine_id == None:
+            self.engine_id = topic
+
+        if self.engine_id != topic:
+            raise RuntimeError(f"You cannot use the same queue for two different topics!")
 
 
     def __repr__(self) -> str:

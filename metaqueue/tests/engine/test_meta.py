@@ -53,3 +53,11 @@ class TestMetadataEngine:
         exp_capacity = 2
 
         assert act_capacity == exp_capacity
+
+
+    def test_queue_occupied_s01(self, topics: enum.Enum):
+        mq  = MetaQueue(buffer_size = 3, dtype = int)
+
+        with pytest.raises(RuntimeError):
+            mdengine  = MetadataEngine(topic = topics.topic1, queue = mq)
+            mdengine2 = MetadataEngine(topic = topics.topic2, queue = mq)

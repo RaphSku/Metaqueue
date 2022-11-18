@@ -14,6 +14,7 @@ import numpy as np
 from metaqueue.engine               import MetadataEngine
 from metaqueue.store                import MetaStore, MetaInformation
 from metaqueue.connectors.interface import IFConnector
+from metaqueue.client.consumer      import MetaConsumer
 
 
 @attrs.define
@@ -35,12 +36,23 @@ class MetaBroker:
     metadataengines = attrs.field(factory = list)
     metastore       = attrs.field(factory = MetaStore)
     connector       = attrs.field(factory = IFConnector)
+    consumer        = attrs.field(factory = dict)
 
 
     def __init__(self, metadataengines: list[MetadataEngine], metastore: MetaStore, connector: IFConnector) -> None:
         self.metadataengines = metadataengines
         self.metastore       = metastore
         self.connector       = connector
+        self.consumer        = {}
+
+
+    def register_consumer(self, consumer: MetaConsumer) -> None:
+        if not isinstance(consumer, MetaConsumer):
+            raise TypeError(f"{consumer} is not an instance of MetaConsumer")
+        topic = consumer.topic.name
+        if not topic in self.consumer:
+            self.consumer[topic] = []
+        self.consumer[topic].append(consumer)
 
 
     def run(self, timeout: int) -> None:
@@ -65,6 +77,10 @@ class MetaBroker:
                     metainfo = MetaInformation(name = metadata.name, location = metadata.location, context = metadata.context)
                     self.metastore.push_metainformation(metainfo)
                     self.connector.store(metadata = metadata)
+
+                    topic = mdengine.topic.name
+                    if topic in self.consumer: 
+                        self.consumer[topic].push(metadata)
 
             if (time.time() - stopwatch) >= timeout:
                 break
