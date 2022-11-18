@@ -28,13 +28,14 @@ class MetadataEngine:
         For this use-case queue data structure which
         holds metadata
     """
-    topic  = attrs.field(factory = enum.Enum)
-    _queue = attrs.field(factory = MetaQueue)
+    topic     = attrs.field(factory = enum.Enum)
+    _queue    = attrs.field(factory = MetaQueue)
 
 
     def __init__(self, topic: enum.Enum, queue: MetaQueue) -> None:
         self.topic  = topic
         self._queue = queue
+        self._queue.register_engine(topic)
 
     
     def publish_to_topic(self, metadata: Metadata) -> None:
@@ -66,6 +67,7 @@ class MetadataEngine:
 
     def get_queue_capacity(self) -> int:
         """
+        Get the current queue capacity
 
         Returns
         -------
