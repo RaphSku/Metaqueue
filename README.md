@@ -1,3 +1,5 @@
+# ARCHIVED
+
 [![Author][contributors-shield]][contributors-url]
 [![BSD-3 Clause License][license-shield]][license-url]
 ![example workflow](https://github.com/RaphSku/metaqueue/actions/workflows/ci.yml/badge.svg)
